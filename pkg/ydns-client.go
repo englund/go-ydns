@@ -1,9 +1,11 @@
 package pkg
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type YdnsClient struct {
@@ -18,7 +20,33 @@ func NewYdnsClient(username *string, password *string) *YdnsClient {
 }
 
 func (c *YdnsClient) Update(host *string, ip *string) error {
-	fmt.Println(*ip)
+	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", ydnsBaseUrl, *host, *ip)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.SetBasicAuth(*c.username, *c.password)
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	result := string(body)
+
+	if !strings.Contains(result, "ok") {
+		return errors.New(result)
+	}
+
+	fmt.Println(result)
+
 	return nil
 }
 
