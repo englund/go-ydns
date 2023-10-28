@@ -8,11 +8,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-var host string
+var hosts []string
 
 var updateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update a YDNS record",
+	Short: "Update one or more YDNS records",
 	Run: func(cmd *cobra.Command, args []string) {
 		username := viper.GetString("username")
 		password := viper.GetString("password")
@@ -21,14 +21,17 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("error retrieving ip: ", err)
 		}
-		if err := client.Update(&host, ip); err != nil {
-			log.Fatal("error updating host: ", err)
+
+		for _, host := range hosts {
+			if err := client.Update(&host, ip); err != nil {
+				log.Fatalf("error updating host \"%s\": %s", host, err)
+			}
 		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(updateCmd)
-	updateCmd.Flags().StringVarP(&host, "host", "H", "", "The host to update")
+	updateCmd.Flags().StringSliceVarP(&hosts, "host", "H", nil, "One or more hosts to update")
 	updateCmd.MarkFlagRequired("host")
 }
