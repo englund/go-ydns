@@ -11,7 +11,7 @@ type YdnsClient struct {
 	password *string
 }
 
-const YDNS_BASE_URL = "https://ydns.io/api/v1"
+const ydnsBaseUrl = "https://ydns.io/api/v1"
 
 func NewYdnsClient(username *string, password *string) *YdnsClient {
 	return &YdnsClient{username, password}
@@ -28,7 +28,7 @@ func (c *YdnsClient) Update(host *string) error {
 }
 
 func getIp() (*string, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/ip", YDNS_BASE_URL))
+	resp, err := http.Get(fmt.Sprintf("%s/ip", ydnsBaseUrl))
 	if err != nil {
 		return nil, err
 	}
