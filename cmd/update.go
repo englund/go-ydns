@@ -17,7 +17,11 @@ var updateCmd = &cobra.Command{
 		username := viper.GetString("username")
 		password := viper.GetString("password")
 		client := pkg.NewYdnsClient(&username, &password)
-		if err := client.Update(&host); err != nil {
+		ip, err := client.GetIp()
+		if err != nil {
+			log.Fatal("error retrieving ip: ", err)
+		}
+		if err := client.Update(&host, ip); err != nil {
 			log.Fatal("error updating host: ", err)
 		}
 	},

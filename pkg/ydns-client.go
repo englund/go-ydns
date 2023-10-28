@@ -17,17 +17,12 @@ func NewYdnsClient(username *string, password *string) *YdnsClient {
 	return &YdnsClient{username, password}
 }
 
-func (c *YdnsClient) Update(host *string) error {
-	ip, err := getIp()
-	if err != nil {
-		return err
-	}
-
+func (c *YdnsClient) Update(host *string, ip *string) error {
 	fmt.Println(*ip)
 	return nil
 }
 
-func getIp() (*string, error) {
+func (c *YdnsClient) GetIp() (*string, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/ip", ydnsBaseUrl))
 	if err != nil {
 		return nil, err
