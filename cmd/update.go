@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"log"
+
 	"englund.io/ydns/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -15,7 +17,9 @@ var updateCmd = &cobra.Command{
 		username := viper.GetString("username")
 		password := viper.GetString("password")
 		client := pkg.NewYdnsClient(&username, &password)
-		client.Update(&host)
+		if err := client.Update(&host); err != nil {
+			log.Fatal("error updating host: ", err)
+		}
 	},
 }
 
