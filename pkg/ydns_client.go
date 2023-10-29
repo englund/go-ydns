@@ -9,25 +9,24 @@ import (
 )
 
 type YdnsClient struct {
-	username *string
-	password *string
+	baseUrl  string
+	username string
+	password string
 }
 
-const ydnsBaseUrl = "https://ydns.io/api/v1"
-
-func NewYdnsClient(username *string, password *string) *YdnsClient {
-	return &YdnsClient{username, password}
+func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient {
+	return &YdnsClient{baseUrl, username, password}
 }
 
-func (c *YdnsClient) Update(host *string, ip *string) error {
-	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", ydnsBaseUrl, *host, *ip)
+func (c *YdnsClient) Update(host string, ip string) error {
+	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", c.baseUrl, host, ip)
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
 
-	req.SetBasicAuth(*c.username, *c.password)
+	req.SetBasicAuth(c.username, c.password)
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -51,7 +50,7 @@ func (c *YdnsClient) Update(host *string, ip *string) error {
 }
 
 func (c *YdnsClient) GetIp() (*string, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/ip", ydnsBaseUrl))
+	resp, err := http.Get(fmt.Sprintf("%s/ip", c.baseUrl))
 	if err != nil {
 		return nil, err
 	}

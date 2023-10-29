@@ -14,16 +14,17 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update one or more YDNS records",
 	Run: func(cmd *cobra.Command, args []string) {
+		baseUrl := viper.GetString("baseUrl")
 		username := viper.GetString("username")
 		password := viper.GetString("password")
-		client := pkg.NewYdnsClient(&username, &password)
+		client := pkg.NewYdnsClient(baseUrl, username, password)
 		ip, err := client.GetIp()
 		if err != nil {
 			log.Fatal("error retrieving ip: ", err)
 		}
 
 		for _, host := range hosts {
-			if err := client.Update(&host, ip); err != nil {
+			if err := client.Update(host, *ip); err != nil {
 				log.Fatalf("error updating host \"%s\": %s", host, err)
 			}
 		}
