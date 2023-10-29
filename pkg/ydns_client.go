@@ -22,7 +22,7 @@ func NewYdnsClient(username *string, password *string) *YdnsClient {
 func (c *YdnsClient) Update(host *string, ip *string) error {
 	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", ydnsBaseUrl, *host, *ip)
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
