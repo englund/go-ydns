@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,25 +25,25 @@ func (c *YdnsClient) Update(host string, ip string) error {
 	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating new request: %v", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("making HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return fmt.Errorf("reading response body: %v", err)
 	}
 
 	result := string(body)
 
 	if !strings.Contains(result, "ok") {
-		return errors.New(result)
+		return fmt.Errorf("unexpected response: %s", result)
 	}
 
 	fmt.Println(result)
