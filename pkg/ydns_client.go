@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type YdnsClient struct {
@@ -20,7 +21,9 @@ func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient
 
 func (c *YdnsClient) Update(host string, ip string) error {
 	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", c.baseUrl, host, ip)
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
