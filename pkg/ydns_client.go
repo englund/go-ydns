@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -19,11 +20,21 @@ func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient
 }
 
 func (c *YdnsClient) Update(host string, ip string) error {
-	url := fmt.Sprintf("%s/update/?host=%s&ip=%s", c.baseUrl, host, ip)
+	u, err := url.Parse(c.baseUrl)
+	if err != nil {
+		return fmt.Errorf("parsing base URL: %v", err)
+	}
+
+	u.Path = "/update/"
+	q := u.Query()
+	q.Set("host", host)
+	q.Set("ip", ip)
+	u.RawQuery = q.Encode()
+
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("creating new request: %v", err)
 	}
