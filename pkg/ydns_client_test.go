@@ -104,6 +104,18 @@ func TestUpdate(t *testing.T) {
 				if r.URL.RawQuery != fmt.Sprintf("host=%s&ip=%s", tc.host, tc.ip) {
 					t.Fatalf("Unexpected query, got: %s", r.URL.RawQuery)
 				}
+
+				actualUsername, actualPassword, ok := r.BasicAuth()
+				if !ok {
+					t.Fatalf("Expected basic auth header")
+				}
+				if actualUsername != username {
+					t.Errorf("Expected username to be '%s', got: %s", username, actualUsername)
+				}
+				if actualPassword != password {
+					t.Errorf("Expected password to be '%s', got: %s", password, actualPassword)
+				}
+
 				w.WriteHeader(tc.statusCode)
 				w.Write([]byte(tc.response))
 			}))
