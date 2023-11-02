@@ -12,34 +12,36 @@ type YdnsClient struct {
 	baseUrl  string
 	username string
 	password string
+	client   *http.Client
 }
 
 func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient {
-	return &YdnsClient{baseUrl, username, password}
+	return &YdnsClient{
+		baseUrl:  baseUrl,
+		username: username,
+		password: password,
+		client: &http.Client{
+			Timeout: time.Second * 10,
+		},
+	}
 }
 
 func (c *YdnsClient) Update(host string, ip string) error {
-	u, err := url.Parse(c.baseUrl)
+	u, err := c.newRequestUrl("/update/", map[string]string{
+		"host": host,
+		"ip":   ip,
+	})
 	if err != nil {
-		return fmt.Errorf("parsing base URL: %v", err)
+		return fmt.Errorf("creating new request: %v", err)
 	}
 
-	u.Path = "/update/"
-	q := u.Query()
-	q.Set("host", host)
-	q.Set("ip", ip)
-	u.RawQuery = q.Encode()
-
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
 		return fmt.Errorf("creating new request: %v", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
-	resp, err := client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("making HTTP request: %v", err)
 	}
@@ -66,18 +68,12 @@ func (c *YdnsClient) Update(host string, ip string) error {
 }
 
 func (c *YdnsClient) GetIp() (*string, error) {
-	u, err := url.Parse(c.baseUrl)
+	u, err := c.newRequestUrl("/ip", nil)
 	if err != nil {
-		return nil, fmt.Errorf("parsing base URL: %v", err)
+		return nil, fmt.Errorf("creating new request: %v", err)
 	}
 
-	u.Path = "/ip"
-
-	client := &http.Client{
-		Timeout: time.Second * 10,
-	}
-
-	resp, err := client.Get(u.String())
+	resp, err := c.client.Get(u.String())
 	if err != nil {
 		return nil, fmt.Errorf("making HTTP request: %v", err)
 	}
@@ -94,4 +90,17 @@ func (c *YdnsClient) GetIp() (*string, error) {
 
 	ip := string(body)
 	return &ip, nil
+}
+
+func (c *YdnsClient) newRequestUrl(path string, params map[string]string) (*url.URL, error) {
+	u, err := url.Parse(c.baseUrl + path)
+	if err != nil {
+		return nil, fmt.Errorf("parsing URL: %v", err)
+	}
+	q := u.Query()
+	for k, v := range params {
+		q.Set(k, v)
+	}
+	u.RawQuery = q.Encode()
+	return u, nil
 }
