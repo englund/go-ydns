@@ -63,15 +63,26 @@ func (c *YdnsClient) Update(host string, ip string) error {
 }
 
 func (c *YdnsClient) GetIp() (*string, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/ip", c.baseUrl))
+	u, err := url.Parse(c.baseUrl)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parsing base URL: %v", err)
+	}
+
+	u.Path = "/ip"
+
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+
+	resp, err := client.Get(u.String())
+	if err != nil {
+		return nil, fmt.Errorf("making HTTP request: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("reading response body: %v", err)
 	}
 
 	ip := string(body)
