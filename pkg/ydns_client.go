@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -53,7 +52,7 @@ func (c *YdnsClient) Update(host string, ip string) error {
 
 	result := string(body)
 
-	if !strings.Contains(result, "ok") {
+	if result != "ok" {
 		return fmt.Errorf("unexpected response: %s", result)
 	}
 
