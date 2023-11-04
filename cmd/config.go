@@ -31,8 +31,8 @@ var cfg Config
 func initConfig() {
 	viper.SetConfigName("ydns")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("/etc/ydns/")
-	viper.AddConfigPath("$HOME/.ydns")
+	viper.AddConfigPath("/etc/ydns-updater/")
+	viper.AddConfigPath("$HOME/.ydns-updater")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
