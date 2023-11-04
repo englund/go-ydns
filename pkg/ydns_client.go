@@ -62,8 +62,6 @@ func (c *YdnsClient) Update(host string, ip string) error {
 		return fmt.Errorf("unexpected response: %s", result)
 	}
 
-	fmt.Println(result)
-
 	return nil
 }
 
