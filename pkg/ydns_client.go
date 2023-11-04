@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// YdnsClient represents a client for the YDNS API.
 type YdnsClient struct {
 	baseUrl  string
 	username string
@@ -15,6 +16,7 @@ type YdnsClient struct {
 	client   *http.Client
 }
 
+// NewYdnsClient creates a new YdnsClient.
 func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient {
 	return &YdnsClient{
 		baseUrl:  baseUrl,
@@ -26,6 +28,8 @@ func NewYdnsClient(baseUrl string, username string, password string) *YdnsClient
 	}
 }
 
+// Update sends a request to the YDNS API to update the IP address for the given host.
+// It returns an error if the request fails or if the response status is not OK.
 func (c *YdnsClient) Update(host string, ip string) error {
 	u, err := c.newRequestUrl("/update/", map[string]string{
 		"host": host,
@@ -65,6 +69,8 @@ func (c *YdnsClient) Update(host string, ip string) error {
 	return nil
 }
 
+// GetIp sends a request to the YDNS API to get the current IP address.
+// It returns the IP address as a string, or an error if the request fails or if the response status is not OK.
 func (c *YdnsClient) GetIp() (*string, error) {
 	u, err := c.newRequestUrl("/ip", nil)
 	if err != nil {
