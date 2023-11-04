@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 const username = "username"
@@ -32,11 +34,12 @@ func TestGetIp(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path != "/ip" {
-					t.Fatalf("Expected a request to '/ip', got: %s", r.URL.Path)
-				}
+				require.Equal(t, "/ip", r.URL.Path)
 				w.WriteHeader(tc.statusCode)
 				w.Write([]byte(tc.ip))
 			}))
@@ -45,16 +48,10 @@ func TestGetIp(t *testing.T) {
 			client := NewYdnsClient(server.URL, username, password)
 			actualIp, err := client.GetIp()
 			if tc.expectError {
-				if err == nil {
-					t.Errorf("Expected error, got nil")
-				}
+				require.Error(t, err)
 			} else {
-				if err != nil {
-					t.Errorf("Did not expect error, got: %v", err)
-				}
-				if *actualIp != tc.ip {
-					t.Errorf("Actual ip %s was not equal to %s", *actualIp, tc.ip)
-				}
+				require.NoError(t, err)
+				require.Equal(t, tc.ip, *actualIp)
 			}
 		})
 	}
@@ -96,25 +93,18 @@ func TestUpdate(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path != "/update/" {
-					t.Fatalf("Expected a request to '/update/', got: %s", r.URL.Path)
-				}
-				if r.URL.RawQuery != fmt.Sprintf("host=%s&ip=%s", tc.host, tc.ip) {
-					t.Fatalf("Unexpected query, got: %s", r.URL.RawQuery)
-				}
+				require.Equal(t, "/update/", r.URL.Path)
+				require.Equal(t, fmt.Sprintf("host=%s&ip=%s", tc.host, tc.ip), r.URL.RawQuery)
 
 				actualUsername, actualPassword, ok := r.BasicAuth()
-				if !ok {
-					t.Fatalf("Expected basic auth header")
-				}
-				if actualUsername != username {
-					t.Errorf("Expected username to be '%s', got: %s", username, actualUsername)
-				}
-				if actualPassword != password {
-					t.Errorf("Expected password to be '%s', got: %s", password, actualPassword)
-				}
+				require.True(t, ok)
+
+				require.Equal(t, username, actualUsername)
+				require.Equal(t, password, actualPassword)
 
 				w.WriteHeader(tc.statusCode)
 				w.Write([]byte(tc.response))
@@ -123,11 +113,10 @@ func TestUpdate(t *testing.T) {
 
 			client := NewYdnsClient(server.URL, username, password)
 			err := client.Update(tc.host, tc.ip)
-			if tc.expectError && err == nil {
-				t.Errorf("Expected error, got nil")
-			}
-			if !tc.expectError && err != nil {
-				t.Errorf("Did not expected error %s", err)
+			if tc.expectError {
+				require.Error(t, err, "Expected error, got nil")
+			} else {
+				require.NoError(t, err, "Did not expect error, got: %s", err)
 			}
 		})
 	}
