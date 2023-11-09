@@ -28,10 +28,24 @@ var updateCmd = &cobra.Command{
 	Short: "Update one or more YDNS records",
 	Run: func(cmd *cobra.Command, args []string) {
 		client := pkg.NewYdnsClient(cfg.BaseUrl, cfg.Username, cfg.Password)
-		ip := getIp(client)
+		currentIp := getIp(client)
+
+		savedIp, err := pkg.ReadIpFromFile(cfg.LastIpFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if currentIp == savedIp {
+			// IP address has not changed, no need to update
+			return
+		}
+
+		if err := pkg.WriteIpToFile(cfg.LastIpFile, currentIp); err != nil {
+			log.Fatal(err)
+		}
 
 		for _, host := range hosts {
-			updateHost(client, host, ip)
+			updateHost(client, host, currentIp)
 		}
 	},
 }

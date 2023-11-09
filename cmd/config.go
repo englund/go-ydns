@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	BaseUrl  string `mapstructure:"baseUrl"`
-	Username string `mapstructure:"username"`
-	Password string `mapstructure:"password"`
+	BaseUrl    string `mapstructure:"baseUrl"`
+	Username   string `mapstructure:"username"`
+	Password   string `mapstructure:"password"`
+	LastIpFile string `mapstructure:"lastIpFile"`
 }
 
 func (c *Config) Validate() error {
@@ -23,6 +24,9 @@ func (c *Config) Validate() error {
 	if c.Password == "" {
 		return errors.New("password is required")
 	}
+	if c.LastIpFile == "" {
+		return errors.New("lastIpFile is required")
+	}
 	return nil
 }
 
@@ -34,6 +38,9 @@ func initConfig() {
 	viper.AddConfigPath("/etc/ydns-updater/")
 	viper.AddConfigPath("$HOME/.ydns-updater")
 	viper.AddConfigPath(".")
+
+	viper.SetDefault("lastIpFile", "/tmp/ydns_last_ip")
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatalf("error reading config file: %s", err)
