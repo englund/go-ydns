@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 
 	"englund.io/ydns/pkg"
@@ -47,6 +48,8 @@ var updateCmd = &cobra.Command{
 		for _, host := range hosts {
 			updateHost(client, host, currentIp)
 		}
+
+		fmt.Printf("Successfully updated hosts with new IP address: %s\n", currentIp)
 	},
 }
 
