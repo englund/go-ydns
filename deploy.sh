@@ -2,4 +2,4 @@
 
 source .env
 
-scp ydns $SCP_DEPLOY_DEST
+scp ydns-updater $SCP_DEPLOY_DEST
