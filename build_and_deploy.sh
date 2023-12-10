@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
+source .env
+
 env GOOS=linux GOARCH=arm64 go build .
-scp ydns root@192.168.1.1:/usr/local/bin/ydns-updater
+scp ydns $SCP_DEPLOY_DEST
