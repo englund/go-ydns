@@ -1,7 +1,7 @@
 include .env
 
 # Binary output name
-BINARY = ydns-updater
+BINARY = ydns
 
 # Go related variables
 GOBASE = $(shell pwd)
