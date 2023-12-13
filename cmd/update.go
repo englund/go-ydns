@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"englund.io/ydns/config"
 	"englund.io/ydns/pkg"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +29,7 @@ var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update one or more YDNS records",
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg := config.Config
 		client := pkg.NewYdnsClient(cfg.BaseUrl, cfg.Username, cfg.Password)
 		currentIp := getIp(client)
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"englund.io/ydns/config"
 	"englund.io/ydns/pkg"
 	"github.com/spf13/cobra"
 )
@@ -12,6 +13,7 @@ var ipCmd = &cobra.Command{
 	Use:   "ip",
 	Short: "Get IP address",
 	Run: func(cmd *cobra.Command, args []string) {
+		cfg := config.Config
 		client := pkg.NewYdnsClient(cfg.BaseUrl, cfg.Username, cfg.Password)
 		ip, err := client.GetIp()
 		if err != nil {

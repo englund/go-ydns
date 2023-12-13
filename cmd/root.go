@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 
+	"englund.io/ydns/config"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +13,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	initConfig()
+	config.InitConfig()
 	err := rootCmd.Execute()
 	if err != nil {
 		log.Fatalf("something went terrible wrong: %s", err)

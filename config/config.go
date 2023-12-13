@@ -1,4 +1,4 @@
-package cmd
+package config
 
 import (
 	"errors"
@@ -7,14 +7,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+var Config config
+
+type config struct {
 	BaseUrl    string `mapstructure:"baseUrl"`
 	Username   string `mapstructure:"username"`
 	Password   string `mapstructure:"password"`
 	LastIpFile string `mapstructure:"lastIpFile"`
 }
 
-func (c *Config) Validate() error {
+func (c *config) validate() error {
 	if c.BaseUrl == "" {
 		return errors.New("baseUrl is required")
 	}
@@ -30,9 +32,7 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-var cfg Config
-
-func initConfig() {
+func InitConfig() {
 	viper.SetConfigName("ydns")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("/etc/ydns-updater/")
@@ -46,12 +46,12 @@ func initConfig() {
 		log.Fatalf("error reading config file: %s", err)
 	}
 
-	err = viper.Unmarshal(&cfg)
+	err = viper.Unmarshal(&Config)
 	if err != nil {
 		log.Fatalf("unable to decode into struct, %v", err)
 	}
 
-	err = cfg.Validate()
+	err = Config.validate()
 	if err != nil {
 		log.Fatalf("invalid configuration: %s", err)
 	}
