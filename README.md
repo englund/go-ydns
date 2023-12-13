@@ -5,7 +5,7 @@ This project is a YDNS updater written in Go.
 ## Build
 
 ```sh
-$ go build -o ydns-updater
+$ make build
 ```
 
 ## Usage
@@ -13,11 +13,11 @@ $ go build -o ydns-updater
 **Retrieve current IP**
 
 ```sh
-$ ydns-updater ip
+$ bin/ydns-updater ip
 ```
 
 **Update an YDNS record with current IP**
 
 ```sh
-$ ydns-updater update -H example.com [-H example2.com]
+$ bin/ydns-updater update -H example.com [-H example2.com]
 ```
